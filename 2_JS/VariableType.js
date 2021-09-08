@@ -1,0 +1,17 @@
+var array = [1, 2, 3, 4, 5, 6];
+var object = { one: 1, "two": "two", three: [3] };
+var c;
+var d = null;
+var string = "HELLO I AM STRING";
+console.log(array);
+console.log(`The Variable ${array} is of the type ${typeof array}`);
+console.log(object);
+console.log(`The Variable ${object} is of the type ${typeof object}`);
+console.log(c);
+console.log(`The Variable ${c} is if the type ${typeof c}`);
+console.log(d);
+console.log(`The Variable ${d} is of the type ${typeof d}`);
+console.log(object['one']);
+console.log(`The Variable ${object['one']} is of the type ${typeof object['one']}`);
+console.log(string);
+console.log(`The Variable ${string} is of the type ${typeof string}`);
