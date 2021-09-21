@@ -25,7 +25,7 @@ export class User{
             name:this.name,
             age:this.age,
             email:this.email,
-            password:this.password,
+            
         };
     }
     getLoginDetails() {

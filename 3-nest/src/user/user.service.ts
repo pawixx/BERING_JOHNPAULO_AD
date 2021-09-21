@@ -37,10 +37,12 @@ export class UserService {
     }
     
     addUser(user:any){
+      if(!user.name || !user.password || !user.age || !user.email) return false;
             var newUser: User;
             var generatedID = this.users.size + 1
             newUser = new User(generatedID, user.name, user.age, user.email, user.password);
             this.users.set(generatedID, newUser);
+            return true;  
 }
     loginUser(user:any) {
 
@@ -56,16 +58,28 @@ export class UserService {
     return false;
     }
     
-    deleteUser(id:number){
-            if(this.users.has(id)){
-            this.users.delete(id);
-            return "User deleted";
-    }
-            return "User not found"
+    deleteUser(id:number) {
+      let to_delete;
+      
+      for(const [key, value] of this.users.entries()) {
+        let json = value.toJson()
+      
+        if(json.id == id) {
+          to_delete = key;
+          break;
         }
+      }
+      
+      if(to_delete) {
+        if(this.users.delete(to_delete)) return "User deleted";
+        else return "User not found";
+      }
+      
+      return "User not found";
+      }
         
     putUser(id: number, body: any) {
-
+      if(body.id) return false;
         if(!body.name || !body.email || !body.password || !body.age) 
         return false;
             
@@ -81,43 +95,49 @@ export class UserService {
             
         if(!to_update) return false;
             
-        this.users.set(id, new User(id, body.name, body.age, body.email, body.password));
+        this.users.set(+id, new User(+id, body.name, body.age, body.email, body.password));
         return true;
          }
-    replaceUser(id:number, body:any) {
+         replaceUser(id:number, body:any) {
 
-            let to_update;
-            
-            for(const user of this.users.values()) {
-              let json = user.toJson();
-              if(json.id == id) {
-                to_update = json;
-                break;
+          if(Object.keys(body).length < 1) return false;
+          
+          let to_update;
+          
+          for(const user of this.users.values()) {
+            let json = user.toJson();
+            if(json.id == id) {
+              to_update = json;
+              break;
+            }
+          }
+          
+          if(!to_update) return false;
+          
+          for(const property in body) {
+            if(['name', 'age', 'email', 'password'].indexOf(property) == -1) return false;
+          
+            to_update[property] = body[property];
+          }
+          
+          this.users.set(+id, new User(+id, to_update.name, to_update.age, to_update.email, to_update.password));
+          return true;
+          }
+    searchUser(term:string) {
+
+              const search = term.toLowerCase()
+              
+              const results = [];
+              
+              
+              for(const user of this.users.values()) {
+                let json = (<any>user).toJson();
+                console.log(json)
+              
+                if(json.name.toLowerCase().includes(search)) results.push(json);
+                else if (json.email.toLowerCase().includes(search)) results.push(json);
               }
-            }
-            
-            if(!to_update) return false;
-            
-            for(const property in body) {
-              if(!(property in ['name', 'age', 'email', 'password'])) return false;
-            
-              to_update[property] = body[property];
-            }
-            
-            this.users.set(id, new User(id, to_update.name, to_update.age, to_update.email, to_update.password));
-            return true;
-            }
-        searchUser(term:string) {
-
-                const results = [];
-                
-                for(const user in this.users.values()) {
-                    let json = (<any>user).toJson();
-                
-                  if(json.name.includes(term)) results.push(json);
-                  else if (json.email.includes(term)) results.push(json);
-                }
-                
-                return results;
-                }
+              
+              return results;
+              }
 }
